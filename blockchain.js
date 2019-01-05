@@ -48,6 +48,28 @@ class Blockchain {
     // 모든 조건을 통과했을 경우 True를 반환합니다.
     return true;
   }
+
+  /**
+   * 새로운 Chain을 검사하고 자신의 Chain을 치환합니다.
+   * 조건 1: 새로운 Chain의 길이가 기존 Chain보다 길어야 합니다.
+   * 조건 2: 새로운 Chain은 유효해야 합니다(valid).
+   * @param {Array<Block>} newChain 
+   */
+  replaceChain(newChain) {
+    if (newChain.length < this.chain.length) {
+      // 새로운 Chain의 길이가 기존 Chain보다 길어야 합니다.
+      console.log('Received chain is not longer than the current chain.');
+      return;
+    } else if (!this.isValidChain(newChain)) {
+      // 새로운 Chain은 유효해야 합니다.
+      console.log("The received chain is not valid.");
+      return;
+    }
+
+    // 모든 검사를 통과한 경우 치환을 수행합니다.
+    console.log("Replacing blockchain with the new chain.");
+    this.chain = newChain;
+  }
 }
 
 module.exports = Blockchain;
