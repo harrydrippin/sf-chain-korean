@@ -1,5 +1,4 @@
 const Block = require("./block");
-const { DIFFICULTY } = require("../config");
 
 /**
  * Block 클래스에 대한 테스트를 정의합니다.
@@ -36,7 +35,25 @@ describe('Block', () => {
    * Difficulty 상수에 맞는 Hash를 생성해낸다.
    */
   it("generates a hash that matches the difficulty", () => {
-    expect(block.hash.substring(0, DIFFICULTY)).toEqual('0'.repeat(DIFFICULTY));
+    expect(block.hash.substring(0, block.difficulty)).toEqual('0'.repeat(block.difficulty));
     console.log(block.toString());
+  });
+
+  /**
+   * 느리게 채굴되는 Block의 채굴 난이도를 낮추어준다.
+   */
+  it("lowers the difficulty for slowly mined blocks", () => {
+    // Block이 채굴되기 시작한지 1시간 뒤를 상정합니다.
+    expect(Block.adjustDifficulty(block, block.timestamp + 36000))
+      .toEqual(block.difficulty - 1);
+  });
+
+  /**
+   * 빠르게 채굴되는 Block의 채굴 난이도를 높여준다.
+   */
+  it("raises the difficulty for quickly mined blocks", () => {
+    // Block이 채굴되기 시작한지 0.001초 뒤를 상정합니다.
+    expect(Block.adjustDifficulty(block, block.timestamp + 1))
+      .toEqual(block.difficulty + 1);
   });
 });
