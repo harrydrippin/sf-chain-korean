@@ -1,14 +1,16 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const Blockchain = require("../blockchain");
+const P2pServer = require("./p2p-server");
 
 // 이 서버가 어느 포트에 열릴지를 결정합니다.
 // 기본적으로 환경 변수를 따라가며, 없을 경우 3001을 기본으로 합니다.
 const HTTP_PORT = process.env.HTTP_PORT || 3001;
 
-// Express Application을 선언합니다.
+// Express Application과 P2P Server를 선언합니다.
 const app = express();
 const bc = new Blockchain();
+const p2pServer = new P2pServer(bc);
 
 // POST 요청에서 JSON을 Body로 받을 수 있도록 Middleware를 설정합니다.
 app.use(bodyParser.json());
@@ -34,3 +36,6 @@ app.post("/mine", (req, res) => {
 
 // 주어진 포트 번호에 서버를 엽니다.
 app.listen(HTTP_PORT, () => console.log(`Listening on port ${HTTP_PORT}`));
+
+// P2P Server를 엽니다.
+p2pServer.listen();

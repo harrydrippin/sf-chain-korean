@@ -30,10 +30,26 @@ class P2pServer {
     const server = new Websocket.Server({
       port: P2P_PORT
     });
+
+    // 시작할 때 사전 정의된 Peer들과 연결합니다.
+    this.connectToPeers();
     
     // 연결 이벤트에 대한 Listener입니다.
     server.on('connection', socket => this.connectSocket(socket));
     console.log(`Listening for peer-to-peer connections on: ${P2P_PORT}`);
+  }
+
+  /**
+   * 주어진 Peer들과 연결을 수립합니다.
+   */
+  connectToPeers() {
+    peers.forEach(peer => {
+      // 각 Peer 값은 ws://localhost:5001 과 같은 구조를 가진 String입니다.
+      const socket = new Websocket(peer);
+
+      // 서버가 나중에 열리더라도 대응할 수 있도록 open 이벤트를 등록해줍니다.
+      socket.on('open', () => this.connectSocket(socket));
+    });
   }
 
   /**
@@ -45,3 +61,5 @@ class P2pServer {
     console.log('Socket connected');
   }
 }
+
+module.exports = P2pServer;
