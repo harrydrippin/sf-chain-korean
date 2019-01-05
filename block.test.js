@@ -18,14 +18,14 @@ describe('Block', () => {
   });
 
   /**
-   * 생성된 Block의 Data가 실제 Data와 일치하는가?
+   * 생성된 Block의 Data가 실제 Data와 일치한다.
    */
   it("sets the `data` to match the input", () => {
     expect(block.data).toEqual(data);
   });
 
   /**
-   * 생성된 Block의 lastHash가 실제로 마지막 Block의 Hash와 일치하는가?
+   * 생성된 Block의 lastHash가 실제로 마지막 Block의 Hash와 일치한다.
    */
   it("sets the `lastHash` to match the hash of the last block", () => {
     expect(block.lastHash).toEqual(lastBlock.hash);
