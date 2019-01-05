@@ -1,8 +1,6 @@
 // SHA-256 함수를 불러옵니다.
 const SHA256 = require('crypto-js/sha256');
-
-// PoW 시스템에 쓰일 Difficulty 상수를 선언합니다.
-const DIFFICULTY = 4;
+const { DIFFICULTY } = require("../config");
 
 /**
  * 블록체인에 달릴 실제 블록에 대한 클래스입니다.
