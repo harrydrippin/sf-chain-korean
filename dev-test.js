@@ -1,19 +1,11 @@
 // Block 클래스를 불러옵니다.
 const Block = require('./block');
 
-// 인스턴스를 생성합니다.
-const block = new Block(
-  // Timestamp
-  "foo",
-  // lastHash
-  "bar",
-  // hash
-  "zoo",
-  // data
-  "baz"
+// mineBlock 함수가 잘 동작하는지 확인합니다.
+// Genesis Block 바로 뒤에 붙는 Block을 만든다고 가정합니다.
+const fooBlock = Block.mineBlock(
+  Block.genesis(),
+  "foo"
 );
 
-// 위에서 만든 Block을 설명하는 String을 출력해봅니다.
-console.log(block.toString());
-// Genesis Block을 설명하는 String을 출력해봅니다.
-console.log(Block.genesis().toString());
+console.log(fooBlock.toString());

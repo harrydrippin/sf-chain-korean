@@ -44,6 +44,17 @@ class Block {
       []
     );
   }
+
+  static mineBlock(lastBlock, data) {
+    // Timestamp를 생성합니다.
+    const timestamp = Date.now();
+    // 이전 Block의 Hash를 꺼내옵니다.
+    const lastHash = lastBlock.hash;
+    // 지금은 아직 우리의 Hash 함수가 없으므로 임시적으로 지정합니다.
+    const hash = "todo-hash";
+    // 새로 만들어진 Block을 반환합니다.
+    return new this(timestamp, lastHash, hash, data);
+  }
 }
 
 // 이 모듈의 Export에 Block 클래스를 넣습니다.
