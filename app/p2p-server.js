@@ -63,8 +63,8 @@ class P2pServer {
     // 연결된 Socket에게 Message Handler를 붙여줍니다.
     this.messageHandler(socket);
 
-    // 연결된 Socket에게 Blockchain을 메시지로 보내줍니다.
-    socket.send(JSON.stringify(this.blockchain.chain));
+    // 연결된 Socket에게 현재 Chain을 보내줍니다.
+    this.sendChain(socket);
   }
 
   /**
@@ -74,8 +74,26 @@ class P2pServer {
   messageHandler(socket) {
     socket.on('message', message => {
       const data = JSON.parse(message);
-      console.log('data', data);
+
+      // 넘어온 메시지에 들어있는 Chain으로 치환을 시도합니다.
+      this.blockchain.replaceChain(data);
     });
+  }
+
+  /**
+   * 주어진 Socket에게 Blockchain을 메시지로 보내줍니다.
+   * @param {WebSocket} socket Socket 객체
+   */
+  sendChain(socket) {
+    socket.send(JSON.stringify(this.blockchain.chain));
+  }
+
+  /**
+   * 다른 Peer들과 Chain을 동기화시킵니다.
+   */
+  syncChains() {
+    // 각 Peer들마다 현재의 Chain을 보내줍니다.
+    this.sockets.forEach(socket => this.sendChain(socket));
   }
 }
 

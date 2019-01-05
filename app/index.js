@@ -30,6 +30,9 @@ app.post("/mine", (req, res) => {
   const block = bc.addBlock(req.body.data);
   console.log(`New block added: ${block.toString()}`);
 
+  // 갱신된 Chain을 Peer들에게 보내줍니다.
+  p2pServer.syncChains();
+
   // GET blocks로 리디렉션합니다.
   res.redirect("/blocks");
 });
