@@ -75,6 +75,15 @@ class Block {
     // CryptoJS의 SHA256 함수를 이용하여 Hash를 만들어서 String으로 반환합니다.
     return SHA256(`${timestamp}${lastHash}${data}`).toString();
   }
+
+  /**
+   * 주어진 Block에서 Hash를 계산합니다.
+   * @param {Block} block 
+   */
+  static blockHash(block) {
+    const { timestamp, lastHash, data } = block;
+    return Block.hash(timestamp, lastHash, data);
+  }
 }
 
 // 이 모듈의 Export에 Block 클래스를 넣습니다.
