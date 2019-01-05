@@ -1,12 +1,15 @@
+// SHA-256 함수를 불러옵니다.
+const SHA256 = require('crypto-js/sha256');
+
 /**
  * 블록체인에 달릴 실제 블록에 대한 클래스입니다.
  */
 class Block {
   /**
    * Block class의 생성자입니다.
-   * @param {*} timestamp 만들어진 시각
-   * @param {*} lastHash 직전 Block의 Hash
-   * @param {*} hash 지금 만드는 블록의 Hash
+   * @param {Date} timestamp 만들어진 시각
+   * @param {string} lastHash 직전 Block의 Hash
+   * @param {string} hash 지금 만드는 블록의 Hash
    * @param {*} data 지금 만드는 블록에 들어갈 Data
    */
   constructor(timestamp, lastHash, hash, data) {
@@ -45,15 +48,32 @@ class Block {
     );
   }
 
+  /**
+   * 기준 Block을 기반으로 새로운 Block을 생성합니다.
+   * @param {Block} lastBlock 현재의 마지막 Block
+   * @param {*} data Block에 넣을 데이터
+   */
   static mineBlock(lastBlock, data) {
     // Timestamp를 생성합니다.
     const timestamp = Date.now();
     // 이전 Block의 Hash를 꺼내옵니다.
     const lastHash = lastBlock.hash;
-    // 지금은 아직 우리의 Hash 함수가 없으므로 임시적으로 지정합니다.
-    const hash = "todo-hash";
+    // Block.hash 함수를 사용하여 현재 Block의 Hash를 만듭니다.
+    const hash = Block.hash(timestamp, lastHash, data);
+
     // 새로 만들어진 Block을 반환합니다.
     return new this(timestamp, lastHash, hash, data);
+  }
+
+  /**
+   * 주어진 데이터를 이용하여 SHA-256 Hash를 만들어냅니다.
+   * @param {Date} timestamp Timestamp 값
+   * @param {string} lastHash lastHash 값
+   * @param {*} data data 값
+   */
+  static hash(timestamp, lastHash, data) {
+    // CryptoJS의 SHA256 함수를 이용하여 Hash를 만들어서 String으로 반환합니다.
+    return SHA256(`${timestamp}${lastHash}${data}`).toString();
   }
 }
 
