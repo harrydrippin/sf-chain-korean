@@ -59,6 +59,23 @@ class P2pServer {
   connectSocket(socket) {
     this.sockets.push(socket);
     console.log('Socket connected');
+
+    // 연결된 Socket에게 Message Handler를 붙여줍니다.
+    this.messageHandler(socket);
+
+    // 연결된 Socket에게 Blockchain을 메시지로 보내줍니다.
+    socket.send(JSON.stringify(this.blockchain.chain));
+  }
+
+  /**
+   * Socket Message Handler를 등록합니다.
+   * @param {WebSocket} socket Socket 객체
+   */
+  messageHandler(socket) {
+    socket.on('message', message => {
+      const data = JSON.parse(message);
+      console.log('data', data);
+    });
   }
 }
 
