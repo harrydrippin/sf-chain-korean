@@ -13,5 +13,7 @@ const block = new Block(
   "baz"
 );
 
-// 위에서 만든 블록을 설명하는 String을 출력해봅니다.
+// 위에서 만든 Block을 설명하는 String을 출력해봅니다.
 console.log(block.toString());
+// Genesis Block을 설명하는 String을 출력해봅니다.
+console.log(Block.genesis().toString());

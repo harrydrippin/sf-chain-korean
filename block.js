@@ -28,6 +28,22 @@ class Block {
       Data      : ${this.data}
     `;
   }
+
+  /**
+   * Genesis Block을 가져올 수 있는 함수입니다.
+   * 인스턴스 없이도 사용할 수 있도록 static이 부여됩니다.
+   */
+  static genesis() {
+    return new this(
+      "Genesis time",
+      // 이전 Hash는 없습니다.
+      "-----",
+      // 첫 Hash를 Hardcode합니다.
+      "f1r57-h45h",
+      // Genesis Block의 데이터로써 빈 Array를 넣습니다.
+      []
+    );
+  }
 }
 
 // 이 모듈의 Export에 Block 클래스를 넣습니다.
