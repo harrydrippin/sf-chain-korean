@@ -1,6 +1,9 @@
 // SHA-256 함수를 불러옵니다.
 const SHA256 = require('crypto-js/sha256');
 
+// PoW 시스템에 쓰일 Difficulty 상수를 선언합니다.
+const DIFFICULTY = 4;
+
 /**
  * 블록체인에 달릴 실제 블록에 대한 클래스입니다.
  */
@@ -11,12 +14,14 @@ class Block {
    * @param {string} lastHash 직전 Block의 Hash
    * @param {string} hash 지금 만드는 블록의 Hash
    * @param {*} data 지금 만드는 블록에 들어갈 Data
+   * @param {string} nonce Nonce 값
    */
-  constructor(timestamp, lastHash, hash, data) {
+  constructor(timestamp, lastHash, hash, data, nonce) {
     this.timestamp = timestamp;
     this.lastHash = lastHash;
     this.hash = hash;
     this.data = data;
+    this.nonce = nonce;
   }
 
   /**
@@ -28,6 +33,7 @@ class Block {
       Timestamp : ${this.timestamp}
       Last Hash : ${this.lastHash.substring(0, 10)}
       Hash      : ${this.hash.substring(0, 10)}
+      Nonce     : ${this.nonce}
       Data      : ${this.data}
     `;
   }
@@ -44,7 +50,9 @@ class Block {
       // 첫 Hash를 Hardcode합니다.
       "f1r57-h45h",
       // Genesis Block의 데이터로써 빈 Array를 넣습니다.
-      []
+      [],
+      // 최초의 Nonce 값입니다.
+      0
     );
   }
 
@@ -54,26 +62,37 @@ class Block {
    * @param {*} data Block에 넣을 데이터
    */
   static mineBlock(lastBlock, data) {
-    // Timestamp를 생성합니다.
-    const timestamp = Date.now();
+    // Hash와 Timestamp를 보관할 변수를 선언합니다.
+    let hash, timestamp;
     // 이전 Block의 Hash를 꺼내옵니다.
     const lastHash = lastBlock.hash;
-    // Block.hash 함수를 사용하여 현재 Block의 Hash를 만듭니다.
-    const hash = Block.hash(timestamp, lastHash, data);
+    // Nonce 값을 보관할 변수를 선언합니다.
+    let nonce = 0;
+    
+    // 적합한 Nonce 값을 찾을 때까지 채굴을 수행합니다.
+    do {
+      // Nonce 값을 1 증가시킵니다.
+      nonce++;
+      // 현재의 시간 값을 받아옵니다.
+      timestamp = Date.now();
+      // Block.hash 함수를 사용하여 현재 Nonce 기준의 Hash를 만듭니다.
+      hash = Block.hash(timestamp, lastHash, data, nonce);
+    } while (hash.substring(0, DIFFICULTY) !== "0".repeat(DIFFICULTY));
 
     // 새로 만들어진 Block을 반환합니다.
-    return new this(timestamp, lastHash, hash, data);
+    return new this(timestamp, lastHash, hash, data, nonce);
   }
 
   /**
    * 주어진 데이터를 이용하여 SHA-256 Hash를 만들어냅니다.
-   * @param {Date} timestamp Timestamp 값
+   * @param {Date} timestamp timestamp 값
    * @param {string} lastHash lastHash 값
    * @param {*} data data 값
+   * @param {string} nonce nonce 값
    */
-  static hash(timestamp, lastHash, data) {
+  static hash(timestamp, lastHash, data, nonce) {
     // CryptoJS의 SHA256 함수를 이용하여 Hash를 만들어서 String으로 반환합니다.
-    return SHA256(`${timestamp}${lastHash}${data}`).toString();
+    return SHA256(`${timestamp}${lastHash}${data}${nonce}`).toString();
   }
 
   /**
@@ -81,8 +100,8 @@ class Block {
    * @param {Block} block 
    */
   static blockHash(block) {
-    const { timestamp, lastHash, data } = block;
-    return Block.hash(timestamp, lastHash, data);
+    const { timestamp, lastHash, data, nonce } = block;
+    return Block.hash(timestamp, lastHash, data, nonce);
   }
 }
 
