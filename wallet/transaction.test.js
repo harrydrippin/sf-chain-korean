@@ -1,5 +1,6 @@
 const Transaction = require("./transaction");
 const Wallet = require("./index");
+const { MINING_REWARD } = require("../config");
 
 describe("Transaction", () => {
   let transaction, wallet, recipient, amount;
@@ -100,6 +101,24 @@ describe("Transaction", () => {
     it('outputs an amount for the next recipient', () => {
       expect(transaction.outputs.find(output => output.address === nextRecipient).amount)
         .toEqual(nextAmount);
+    });
+  });
+
+  /**
+   * 채굴자 보상 Transaction을 만드는 경우
+   */
+  describe("creating a reward transaction", () => {
+    beforeEach(() => {
+      // 보상 Transaction을 만듭니다.
+      transaction = Transaction.rewardTransaction(wallet, Wallet.blockchainWallet());
+    });
+
+    /**
+     * 채굴자의 Wallet에 보상을 준다.
+     */
+    it(`reward the miner's wallet`, () => {
+      expect(transaction.outputs.find(output => output.address === wallet.publicKey).amount)
+        .toEqual(MINING_REWARD);
     });
   });
 });
