@@ -1,17 +1,19 @@
 const TransactionPool = require("./transaction-pool");
 const Transaction = require("./transaction");
 const Wallet = require("./index");
+const Blockchain = require("../blockchain");
 
 describe("TransactionPool", () => {
-  let tp, wallet, transaction;
+  let tp, wallet, transaction, bc;
 
   beforeEach(() => {
     // Transaction을 하나 생성하고 이를 Pool에 넣는 작업을 수행합니다.
     tp = new TransactionPool();
     wallet = new Wallet();
+    bc = new Blockchain();
 
     // Wallet의 함수를 이용해 Transaction을 만듭니다.
-    transaction = wallet.createTransaction('r4nd-4dr355', 30, tp);
+    transaction = wallet.createTransaction('r4nd-4dr355', 30, bc, tp);
   });
 
   /**
@@ -52,7 +54,7 @@ describe("TransactionPool", () => {
       // 6개의 가짜 Transaction을 만듭니다.
       for (let i = 0; i < 6; i++) {
         wallet = new Wallet();
-        transaction = wallet.createTransaction('r4nd-4dr355', 30, tp);
+        transaction = wallet.createTransaction('r4nd-4dr355', 30, bc, tp);
         if (i % 2 == 0) {
           // 짝수 번째의 Transaction을 유효하지 않도록 만듭니다.
           transaction.input.amount = 99999;

@@ -1,13 +1,15 @@
 const Wallet = require("./index");
 const TransactionPool = require("./transaction-pool");
+const Blockchain = require("../blockchain");
 
 describe("Wallet", () => {
-  let wallet, tp;
+  let wallet, tp, bc;
 
   beforeEach(() => {
     // Wallet과 Transaction Pool을 생성합니다.
     wallet = new Wallet();
     tp = new TransactionPool();
+    bc = new Blockchain();
   });
 
   /**
@@ -20,7 +22,7 @@ describe("Wallet", () => {
       // 특정 수신자에게 50만큼을 보내는 Transaction을 만듭니다.
       sendAmount = 50;
       recipient = "r4nd0m-4ddr355";
-      transaction = wallet.createTransaction(recipient, sendAmount, tp);
+      transaction = wallet.createTransaction(recipient, sendAmount, bc, tp);
     });
 
     /**
@@ -29,7 +31,7 @@ describe("Wallet", () => {
     describe("and doing the same transaction", () => {
       beforeEach(() => {
         // 위의 정보로 하나의 Transaction을 더 만듭니다.
-        wallet.createTransaction(recipient, sendAmount, tp);
+        wallet.createTransaction(recipient, sendAmount, bc, tp);
       });
 
       /**

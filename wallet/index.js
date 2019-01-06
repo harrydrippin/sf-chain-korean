@@ -39,9 +39,12 @@ class Wallet {
    * Transaction을 만듭니다.
    * @param {string} recipient 수신자
    * @param {number} amount 보내는 양
+   * @param {Blockchain} blockchain Blockchain 객체
    * @param {TransactionPool} transactionPool 지정된 Transaction Pool
    */
-  createTransaction(recipient, amount, transactionPool) {
+  createTransaction(recipient, amount, blockchain, transactionPool) {
+    this.balance = this.calculateBalance(blockchain);
+
     // 잔고보다 많은 양을 송금하려는 경우 이를 막습니다.
     if (amount > this.balance) {
       console.log(`Amount: ${amount} exceeds current balance: ${this.balance}`);
@@ -81,7 +84,7 @@ class Wallet {
 
     // Input이 자신인 Transaction들을 가져옵니다.
     const walletInputTs = transactions
-      .filter(transaction => transactions.input.address === this.publicKey); 
+      .filter(transaction => transaction.input.address === this.publicKey); 
     
     // Output을 보기 시작할 시간을 보관할 변수입니다.
     let startTime = 0;
@@ -100,7 +103,7 @@ class Wallet {
 
     // 이후 Transaction들을 가져오며 startTime 이후에 시작된 모든 Transaction들에 대하여 Output의 잔고를 더합니다.
     transactions.forEach(transaction => {
-      if (transactions.input.timestamp > startTime) {
+      if (transaction.input.timestamp > startTime) {
         transaction.outputs.find(output => {
           if (output.address === this.publicKey) {
             balance += output.amount;
