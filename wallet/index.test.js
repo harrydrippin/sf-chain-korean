@@ -1,6 +1,7 @@
 const Wallet = require("./index");
 const TransactionPool = require("./transaction-pool");
 const Blockchain = require("../blockchain");
+const { INITIAL_BALANCE } = require("../config");
 
 describe("Wallet", () => {
   let wallet, tp, bc;
@@ -48,6 +49,72 @@ describe("Wallet", () => {
       it("clones the `sendAmount` output for the recipient", () => {
         expect(transaction.outputs.filter(output => output.address === recipient)
           .map(output => output.amount)).toEqual([sendAmount, sendAmount]);
+      });
+    });
+  });
+
+  /**
+   * 잔고를 계산하는 경우
+   */
+  describe("calculating a balance", () => {
+    let addBalance, repeatAdd, senderWallet;
+
+    beforeEach(() => {
+      // Transaction을 몇 개 만들어서 Balance가 변하게 합니다.
+      senderWallet = new Wallet();
+      addBalance = 100;
+      repeatAdd = 3;
+      for (let i = 0; i < repeatAdd; i++) {
+        senderWallet.createTransaction(wallet.publicKey, addBalance, bc, tp);
+      }
+      bc.addBlock(tp.transactions);
+    });
+
+    /**
+     * 지금까지의 수신자 이름이 있는 Block을 이용하여 그에 맞는 Balance를 계산해낸다.
+     */
+    it("calculates the balance for blockchain transactions matching the recipient", () => {
+      expect(wallet.calculateBalance(bc)).toEqual(INITIAL_BALANCE + (addBalance * repeatAdd));
+    });
+
+    /**
+     * 지금까지의 발신자 이름이 있는 Block을 이용하여 그에 맞는 Balance를 계산해낸다.
+     */
+    it("calculates the balance for blockchain transactions matching the sender", () => {
+      expect(senderWallet.calculateBalance(bc)).toEqual(INITIAL_BALANCE - (addBalance * repeatAdd));
+    });
+    
+    /**
+     * 그리고 수신자가 거래를 수행했을 경우
+     */
+    describe('and the recipient conducts a transaction', () => {
+      let subtractBalance, recipientBalance;
+
+      beforeEach(() => {
+        // Pool을 비웁니다.
+        tp.clear();
+        subtractBalance = 60;
+        recipientBalance = wallet.calculateBalance(bc);
+        wallet.createTransaction(senderWallet.publicKey, subtractBalance, bc, tp);
+        bc.addBlock(tp.transactions);
+      });
+      
+      /**
+       * 그리고 발신자가 또 다른 거래를 수신자에게 수행했을 경우
+       */
+      describe('and the sender sends another transaction to the recipient', () => {
+        beforeEach(() => {
+          tp.clear();
+          senderWallet.createTransaction(wallet.publicKey, addBalance, bc, tp);
+          bc.addBlock(tp.transactions);
+        });
+
+        /**
+         * 최근의 Block인 마지막 Block만을 사용해서 수신자의 잔고를 계산한다.
+         */
+        it('calculate the recipient balance only using transactions since its most recent one', () => {
+          expect(wallet.calculateBalance(bc)).toEqual(recipientBalance - subtractBalance + addBalance);
+        });
       });
     });
   });
