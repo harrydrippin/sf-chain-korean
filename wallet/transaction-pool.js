@@ -24,6 +24,14 @@ class TransactionPool {
       this.transactions.push(transaction);
     }
   }
+
+  /**
+   * 주어진 Address를 가지는 Transaction이 이미 존재하는지 확인합니다.
+   * @param {string} address 
+   */
+  existingTransaction(address) {
+    return this.transactions.find(t => t.input.address === address);
+  }
 }
 
 module.exports = TransactionPool;

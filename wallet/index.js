@@ -1,4 +1,5 @@
 const ChainUtil = require("../chain-util");
+const Transaction = require("./transaction");
 const { INITIAL_BALANCE } = require("../config");
 
 /**
@@ -32,6 +33,35 @@ class Wallet {
    */
   sign(dataHash) {
     return this.keyPair.sign(dataHash);
+  }
+
+  /**
+   * Transaction을 만듭니다.
+   * @param {string} recipient 수신자
+   * @param {number} amount 보내는 양
+   * @param {TransactionPool} transactionPool 지정된 Transaction Pool
+   */
+  createTransaction(recipient, amount, transactionPool) {
+    // 잔고보다 많은 양을 송금하려는 경우 이를 막습니다.
+    if (amount > this.balance) {
+      console.log(`Amount: ${amount} exceeds current balance: ${this.balance}`);
+      return;
+    }
+
+    // 이미 존재하는 Transaction이 있다면 가져옵니다.
+    let transaction = transactionPool.existingTransaction(this.publicKey);
+
+    // 있는 경우와 없는 경우를 분기합니다.
+    if (transaction) {
+      // 있는 경우 기존의 Transaction을 Update합니다.
+      transaction.update(this, recipient, amount);
+    } else {
+      // 없는 경우 새 Transaction을 만듭니다.
+      transaction = Transaction.newTransaction(this, recipient, amount);
+      transactionPool.updateOrAddTransaction(transaction);
+    }
+
+    return transaction;
   }
 }
 
