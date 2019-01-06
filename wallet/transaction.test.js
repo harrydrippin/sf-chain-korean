@@ -73,4 +73,33 @@ describe("Transaction", () => {
       expect(transaction).toEqual(undefined);
     });
   });
+
+  /**
+   * Transaction을 Update하려고 하는 경우
+   */
+  describe('and updating a transaction', () => {
+    let nextAmount, nextRecipient;
+
+    beforeEach(() => {
+      nextAmount = 20;
+      nextRecipient = "n3xt-4ddr355";
+      transaction = transaction.update(wallet, nextRecipient, nextAmount);
+    });
+
+    /**
+     * 보내는 사람의 Output에서 다음 거래의 Amount 만큼을 감소시킨다.
+     */
+    it(`subtracts the next amount from the sender's output`, () => {
+      expect(transaction.outputs.find(output => output.address === wallet.publicKey).amount)
+        .toEqual(wallet.balance - amount - nextAmount);
+    });
+
+    /**
+     * 다음 거래의 수신자의 Amount을 Outputs에 보유한다.
+     */
+    it('outputs an amount for the next recipient', () => {
+      expect(transaction.outputs.find(output => output.address === nextRecipient).amount)
+        .toEqual(nextAmount);
+    });
+  });
 });
