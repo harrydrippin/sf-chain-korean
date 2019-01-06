@@ -1,4 +1,5 @@
 const ChainUtil = require("../chain-util");
+const { MINING_REWARD } = require("../config");
 
 /**
  * Transaction 클래스입니다.
@@ -43,33 +44,51 @@ class Transaction {
   }
 
   /**
+   * Transaction에  주어진 Output을 채워넣고 서명합니다.
+   * @param {Wallet} senderWallet 보내는 사람의 Wallet
+   * @param {*} outputs Transaction의 출력
+   */
+  static transactionWithOutputs(senderWallet, outputs) {
+    // 새로운 Transaction 객체를 만듭니다.
+    const transaction = new this();
+    // Transaction에 주어진 Output을 채워넣습니다.
+    transaction.outputs.push(...outputs);
+    // 만들어진 Transaction에 서명하여 Input을 채워넣습니다.
+    Transaction.signTransaction(transaction, senderWallet);
+    
+    return transaction;
+  }
+
+  /**
    * 새로운 Transaction을 생성합니다.
    * @param {Wallet} senderWallet 보내는 사람의 지갑
    * @param {string} recipient 받는 사람의 주소
    * @param {number} amount 보내는 양
    */
   static newTransaction(senderWallet, recipient, amount) {
-    // 새로운 Transaction 객체를 만듭니다.
-    const transaction = new this();
-    
     // 지금 가진 잔고보다 더 많은 돈을 보내는 것은 아닌지 확인합니다.
     if (amount > senderWallet.balance) {
       console.log(`Amount: ${amount} exceeds balance.`);
       return;
     }
 
-    // Transaction의 Output을 만듭니다.
-    transaction.outputs.push(...[
+    return Transaction.transactionWithOutputs(senderWallet, [
       // 송신자의 Balance를 갱신하는 Output입니다.
       { amount: senderWallet.balance - amount, address: senderWallet.publicKey },
-      // 수신자에게 돈을 보내는 것을 확인하는 Outputㅇ비니다.
+      // 수신자에게 돈을 보내는 것을 확인하는 Output입니다.
       { amount, address: recipient }
     ]);
+  }
 
-    // 만들어진 Transaction에 서명하여 Input을 채워넣습니다.
-    Transaction.signTransaction(transaction, senderWallet);
-
-    return transaction;
+  /**
+   * 채굴자에게 보상을 주는 Transaction을 만듭니다.
+   * @param {Wallet} minerWallet 채굴자의 Wallet
+   * @param {Wallet} blockchainWallet Blockchain Wallet
+   */
+  static rewardTransaction(minerWallet, blockchainWallet) {
+    return Transaction.transactionWithOutputs(blockchainWallet, [
+      { amount: MINING_REWARD, address: minerWallet.publicKey }
+    ]);
   }
 
   /**

@@ -8,6 +8,9 @@ const MINE_RATE = 3000;
 // 모든 Wallet의 시작 잔고입니다.
 const INITIAL_BALANCE = 500;
 
+// 채굴자가 받을 보상 상수를 선언합니다.
+const MINING_REWARD = 50;
+
 module.exports = {
-  DIFFICULTY, MINE_RATE, INITIAL_BALANCE
+  DIFFICULTY, MINE_RATE, INITIAL_BALANCE, MINING_REWARD
 };
