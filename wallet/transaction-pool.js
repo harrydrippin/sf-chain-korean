@@ -1,3 +1,5 @@
+const Transaction = require("../wallet/transaction");
+
 /**
  * Transaction Pool 클래스입니다.
  */
@@ -31,6 +33,34 @@ class TransactionPool {
    */
   existingTransaction(address) {
     return this.transactions.find(t => t.input.address === address);
+  }
+
+  /**
+   * 유효한 Transaction들을 필터링해서 가져옵니다.
+   * 조건 1: Input의 Amount가 Output의 모든 Amount를 합친 것과 같아야 합니다.
+   * 조건 2: Signature Verification을 통과해야 합니다.
+   */
+  validTransactions() {
+    return this.transactions.filter(transaction => {
+      // Output에 있는 모든 Amount을 합한 값을 얻어옵니다.
+      const outputTotal = transaction.outputs.reduce((total, output) => {
+        return total + output.amount;
+      }, 0);
+
+      // Input의 Amount가 Output의 모든 Amount를 합친 것과 같아야 합니다.
+      if (transaction.input.amount !== outputTotal) {
+        console.log(`Invalid transaction from ${transaction.input.address}.`);
+        return;
+      }
+
+      // Signature Verification을 통과해야 합니다.
+      if (!Transaction.verifyTransaction(transaction)) {
+        console.log(`Invalid signature from ${transaction.input.address}.`);
+        return;
+      }
+
+      return transaction;
+    });
   }
 }
 
