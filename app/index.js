@@ -61,6 +61,13 @@ app.post("/transact", (req, res) => {
   res.redirect("/transactions");
 });
 
+/**
+ * 자신의 Public Key를 보여주는 API입니다.
+ */
+app.get("/public-key", (req, res) => {
+  res.json({ publicKey: wallet.publicKey });
+});
+
 // 주어진 포트 번호에 서버를 엽니다.
 app.listen(HTTP_PORT, () => console.log(`Listening on port ${HTTP_PORT}`));
 
