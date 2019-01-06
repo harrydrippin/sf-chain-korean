@@ -42,6 +42,22 @@ describe("Transaction", () => {
   });
 
   /**
+   * 유효한 거래를 유효하다고 인식한다.
+   */
+  it('validates a valid transaction', () => {
+    expect(Transaction.verifyTransaction(transaction)).toBe(true);
+  });
+
+  /**
+   * 유효하지 않은 거래를 유효하지 않다고 인식한다.
+   */
+  it('invalidates a corrupt transaction', () => {
+    // Amount를 수정하여 불완전한 거래가 되게 만듭니다.
+    transaction.outputs[0].amount = 50000;
+    expect(Transaction.verifyTransaction(transaction)).toBe(false);
+  });
+
+  /**
    * 잔고를 초과하는 양을 보내려고 시도한 경우
    */
   describe('transacting with an amount that exceeds the balance', () => {
