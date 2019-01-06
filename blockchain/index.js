@@ -56,7 +56,7 @@ class Blockchain {
    * @param {Array<Block>} newChain 
    */
   replaceChain(newChain) {
-    if (newChain.length < this.chain.length) {
+    if (newChain.length <= this.chain.length) {
       // 새로운 Chain의 길이가 기존 Chain보다 길어야 합니다.
       console.log('Received chain is not longer than the current chain.');
       return;

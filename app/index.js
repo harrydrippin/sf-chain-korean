@@ -55,6 +55,8 @@ app.post("/transact", (req, res) => {
   const { recipient, amount } = req.body;
   // Transaction을 만듭니다.
   const transaction = wallet.createTransaction(recipient, amount, tp);
+  // 넘어온 메시지에 들어있는 Transaction을 Broadcast합니다.
+  p2pServer.broadcastTransaction(transaction);
   // GET transactions로 리디렉션합니다.
   res.redirect("/transactions");
 });

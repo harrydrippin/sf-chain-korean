@@ -83,8 +83,17 @@ class P2pServer {
     socket.on('message', message => {
       const data = JSON.parse(message);
 
-      // 넘어온 메시지에 들어있는 Chain으로 치환을 시도합니다.
-      this.blockchain.replaceChain(data);
+      // Data의 Type에 따라 처리를 다르게 합니다.
+      switch (data.type) {
+        case MESSAGE_TYPES.chain:
+          // 넘어온 메시지에 들어있는 Chain으로 치환을 시도합니다.
+          this.blockchain.replaceChain(data.chain);
+          break;
+        case MESSAGE_TYPES.transaction:
+          // Transaction Pool에 추가하거나 갱신합니다.
+          this.transactionPool.updateOrAddTransaction(data.transaction);
+          break;
+      }
     });
   }
 
