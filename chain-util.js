@@ -27,6 +27,16 @@ class ChainUtil {
   static hash(data) {
     return SHA256(JSON.stringify(data)).toString();
   }
+
+  /**
+   * 주어진 Signature가 옳은지 검사합니다.
+   * @param {string} publicKey 서명의 Public Key
+   * @param {string} signature 서명
+   * @param {string} dataHash 데이터의 Hash 값
+   */
+  static verifySignature(publicKey, signature, dataHash) {
+    return ec.keyFromPublic(publicKey, 'hex').verify(dataHash, signature);
+  }
 }
 
 module.exports = ChainUtil;

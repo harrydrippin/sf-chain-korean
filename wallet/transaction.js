@@ -60,6 +60,18 @@ class Transaction {
       signature: senderWallet.sign(ChainUtil.hash(transaction.outputs))
     }
   }
+
+  /**
+   * 거래의 서명이 옳은지 검사합니다.
+   * @param {Transaction} transaction 
+   */
+  static verifyTransaction(transaction) {
+    return ChainUtil.verifySignature(
+      transaction.input.address, 
+      transaction.input.signature,
+      ChainUtil.hash(transaction.outputs)
+    );
+  }
 }
 
 module.exports = Transaction;
