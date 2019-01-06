@@ -48,6 +48,17 @@ app.get("/transactions", (req, res) => {
   res.json(tp.transactions);
 });
 
+/**
+ * Transaction을 보내는 API입니다.
+ */
+app.post("/transact", (req, res) => {
+  const { recipient, amount } = req.body;
+  // Transaction을 만듭니다.
+  const transaction = wallet.createTransaction(recipient, amount, tp);
+  // GET transactions로 리디렉션합니다.
+  res.redirect("/transactions");
+});
+
 // 주어진 포트 번호에 서버를 엽니다.
 app.listen(HTTP_PORT, () => console.log(`Listening on port ${HTTP_PORT}`));
 
