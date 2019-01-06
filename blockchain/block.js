@@ -1,5 +1,4 @@
-// SHA-256 함수를 불러옵니다.
-const SHA256 = require('crypto-js/sha256');
+const ChainUtil = require("../chain-util");
 const { DIFFICULTY, MINE_RATE } = require("../config");
 
 /**
@@ -101,7 +100,7 @@ class Block {
    */
   static hash(timestamp, lastHash, data, nonce, difficulty) {
     // CryptoJS의 SHA256 함수를 이용하여 Hash를 만들어서 String으로 반환합니다.
-    return SHA256(`${timestamp}${lastHash}${data}${nonce}${difficulty}`).toString();
+    return ChainUtil.hash(`${timestamp}${lastHash}${data}${nonce}${difficulty}`).toString();
   }
 
   /**

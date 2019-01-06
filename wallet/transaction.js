@@ -40,7 +40,25 @@ class Transaction {
       { amount, address: recipient }
     ]);
 
+    // 만들어진 Transaction에 서명하여 Input을 채워넣습니다.
+    Transaction.signTransaction(transaction, senderWallet);
+
     return transaction;
+  }
+
+  /**
+   * 주어진 Transaction에 서명합니다.
+   * @param {Transaction} transaction 
+   * @param {Wallet} senderWallet 
+   */
+  static signTransaction(transaction, senderWallet) {
+    transaction.input = {
+      timestamp: Date.now(),
+      amount: senderWallet.balance,
+      address: senderWallet.publicKey,
+      // Transaction의 Output에 대한 서명을 첨부합니다.
+      signature: senderWallet.sign(ChainUtil.hash(transaction.outputs))
+    }
   }
 }
 

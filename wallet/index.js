@@ -25,6 +25,14 @@ class Wallet {
       publicKey : ${this.publicKey.toString()}
       balance   : ${this.balance}`;
   }
+
+  /**
+   * 주어진 Hash 값을 이용해서 서명(Signature)을 만들어냅니다.
+   * @param {string} dataHash 특정 Data의 Hash 표현
+   */
+  sign(dataHash) {
+    return this.keyPair.sign(dataHash);
+  }
 }
 
 module.exports = Wallet;
