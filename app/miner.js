@@ -1,3 +1,6 @@
+const Wallet = require("../wallet");
+const Transaction = require("../wallet/transaction");
+
 /**
  * Miner 클래스입니다.
  */
@@ -21,10 +24,20 @@ class Miner {
    */
   mine() {
     const validTransactions = this.transactionPool.validTransactions();
-    // 채굴자에게 줄 보상을 포함시킴
-    // 유효한 거래로 구성된 Block을 만듬
-    // P2P 서버에서 Blockchain을 동기화시킴
-    // Transaction Pool을 비움
+    // 채굴자에게 줄 보상을 포함시킵니다.
+    validTransactions.push(
+      Transaction.rewardTransaction(this.wallet, Wallet.blockchainWallet())
+    );
+
+    // 유효한 거래로 구성된 Block을 만듭니다.
+    const block = this.blockchain.addBlock(validTransactions);
+    
+    // P2P 서버에서 Blockchain을 동기화시킵니다.
+    this.p2pServer.syncChains();
+
+    // Transaction Pool을 비웁니다.
+    this.transactionPool.clear();
+
     // 모든 채굴자에게 그들의 Transaction Pool을 비우라고 알림
   }
 }

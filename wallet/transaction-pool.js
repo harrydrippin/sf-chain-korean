@@ -62,6 +62,13 @@ class TransactionPool {
       return transaction;
     });
   }
+
+  /**
+   * Transaction Pool을 비웁니다.
+   */
+  clear() {
+    this.transactions = [];
+  }
 }
 
 module.exports = TransactionPool;

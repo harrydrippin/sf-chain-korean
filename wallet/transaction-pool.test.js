@@ -34,6 +34,14 @@ describe("TransactionPool", () => {
   });
 
   /**
+   * Transaction Pool을 비운다.
+   */
+  it('clears transactions', () => {
+    tp.clear();
+    expect(tp.transactions).toEqual([]);
+  })
+
+  /**
    * 유효한 거래와 유효하지 않은 거래가 섞여있는 경우
    */
   describe("mixing valid and corrupt transactions", () => {
