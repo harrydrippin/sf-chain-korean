@@ -35,6 +35,13 @@ describe("Transaction", () => {
    */
 
   /**
+   * 거래에 보내는 사람 Wallet의 잔고를 넣는다.
+   */
+  it("inputs the balance of the wallet", () => {
+    expect(transaction.input.amount).toEqual(wallet.balance);
+  });
+
+  /**
    * 잔고를 초과하는 양을 보내려고 시도한 경우
    */
   describe('transacting with an amount that exceeds the balance', () => {
