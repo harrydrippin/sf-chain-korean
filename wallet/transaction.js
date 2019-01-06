@@ -17,6 +17,32 @@ class Transaction {
   }
 
   /**
+  * Transaction을 Update합니다.
+  * @param {Wallet} senderWallet 보내는 사람의 지갑
+  * @param {string} recipient 받는 사람의 주소
+  * @param {number} amount 보내는 양
+  */
+  update(senderWallet, recipient, amount) {
+    // 해당하는 Sender의 Output을 찾아냅니다.
+    const senderOutput = this.outputs.find(output => output.address === senderWallet.publicKey);
+
+    // 이미 기록된 Amount보다 더 많은 양이 송금되려고 할 경우 이를 막습니다.
+    if (amount > senderOutput.amount) {
+      console.log(`Amount: ${amount} exceeds balance.`);
+      return;
+    }
+
+    // 추가로 명시된 Amount만큼을 감소시킵니다.
+    senderOutput.amount = senderOutput.amount - amount;
+    // 새로운 Output을 넣어줍니다.
+    this.outputs.push({ amount, address: recipient });
+    // Transaction에 서명합니다.
+    Transaction.signTransaction(this, senderWallet);
+
+    return this;
+  }
+
+  /**
    * 새로운 Transaction을 생성합니다.
    * @param {Wallet} senderWallet 보내는 사람의 지갑
    * @param {string} recipient 받는 사람의 주소
