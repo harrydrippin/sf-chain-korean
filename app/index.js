@@ -14,7 +14,7 @@ const app = express();
 const bc = new Blockchain();
 const wallet = new Wallet();
 const tp = new TransactionPool();
-const p2pServer = new P2pServer(bc);
+const p2pServer = new P2pServer(bc, tp);
 
 // POST 요청에서 JSON을 Body로 받을 수 있도록 Middleware를 설정합니다.
 app.use(bodyParser.json());

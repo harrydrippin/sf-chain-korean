@@ -8,16 +8,24 @@ const P2P_PORT = process.env.P2P_PORT || 5001;
 // 각 Peer들의 URL을 Array로 보관합니다. 주어지지 않았다면 빈 Array로 초기화합니다.
 const peers = process.env.PEERS ? process.env.PEERS.split(",") : [];
 
+// 각 Socket Message를 구별하기 위한 Message Type입니다.
+const MESSAGE_TYPES = {
+  chain: "CHAIN",
+  transaction: "TRANSACTION"
+};
+
 /**
  * P2P Server의 클래스입니다.
  */
 class P2pServer {
   /**
    * P2P Server 클래스의 생성자입니다.
-   * @param {blockchain} blockchain Blockchain 객체
+   * @param {Blockchain} blockchain Blockchain 객체
+   * @param {TransactionPool} transactionPool TransactionPool 객체
    */
-  constructor(blockchain) {
+  constructor(blockchain, transactionPool) {
     this.blockchain = blockchain;
+    this.transactionPool = transactionPool;
 
     // 등록된 Socket을 관리할 Array입니다.
     this.sockets = [];
@@ -85,7 +93,22 @@ class P2pServer {
    * @param {WebSocket} socket Socket 객체
    */
   sendChain(socket) {
-    socket.send(JSON.stringify(this.blockchain.chain));
+    socket.send(JSON.stringify({
+      type: MESSAGE_TYPES.chain,
+      chain: this.blockchain.chain
+    }));
+  }
+
+  /**
+   * 주어진 Socket에게 Transaction을 메시지로 보내줍니다.
+   * @param {WebSocket} socket Socket 객체
+   * @param {Transaction} transaction Transaction 객체
+   */
+  sendTransaction(socket, transaction) {
+    socket.send(JSON.stringify({
+      type: MESSAGE_TYPES.transaction,
+      transaction
+    }));
   }
 
   /**
@@ -94,6 +117,14 @@ class P2pServer {
   syncChains() {
     // 각 Peer들마다 현재의 Chain을 보내줍니다.
     this.sockets.forEach(socket => this.sendChain(socket));
+  }
+
+  /**
+   * 만들어진 Transaction을 전파합니다.
+   * @param {Transaction} transaction 
+   */
+  broadcastTransaction(transaction) {
+    this.sockets.forEach(socket => this.sendTransaction(socket, transaction));
   }
 }
 
