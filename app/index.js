@@ -4,6 +4,7 @@ const Blockchain = require("../blockchain");
 const P2pServer = require("./p2p-server");
 const Wallet = require("../wallet");
 const TransactionPool = require("../wallet/transaction-pool");
+const Miner = require("./miner");
 
 // 이 서버가 어느 포트에 열릴지를 결정합니다.
 // 기본적으로 환경 변수를 따라가며, 없을 경우 3001을 기본으로 합니다.
@@ -15,6 +16,7 @@ const bc = new Blockchain();
 const wallet = new Wallet();
 const tp = new TransactionPool();
 const p2pServer = new P2pServer(bc, tp);
+const miner = new Miner(bc, tp, wallet, p2pServer);
 
 // POST 요청에서 JSON을 Body로 받을 수 있도록 Middleware를 설정합니다.
 app.use(bodyParser.json());
@@ -59,6 +61,15 @@ app.post("/transact", (req, res) => {
   p2pServer.broadcastTransaction(transaction);
   // GET transactions로 리디렉션합니다.
   res.redirect("/transactions");
+});
+
+/**
+ * Transaction을 채굴하는 API입니다.
+ */
+app.get("/mine-transactions", (req, res) => {
+  const block = miner.mine();
+  console.log(`New block added: ${block.toString()}`);
+  res.redirect("/blocks");
 });
 
 /**
