@@ -65,6 +65,54 @@ class Wallet {
   }
 
   /**
+   * Wallet의 잔고를 계산합니다.
+   * @param {Blockchain} blockchain 지금까지의 모든 Block이 걸린 Blockchain
+   */
+  calculateBalance(blockchain) {
+    let balance = this.balance;
+    let transactions = [];
+
+    // Transaction을 모두 추출해 Array에 넣습니다.
+    blockchain.chain.forEach(block => {
+      block.data.forEach(transaction => {
+        transactions.push(transaction);
+      });
+    });
+
+    // Input이 자신인 Transaction들을 가져옵니다.
+    const walletInputTs = transactions
+      .filter(transaction => transactions.input.address === this.publicKey); 
+    
+    // Output을 보기 시작할 시간을 보관할 변수입니다.
+    let startTime = 0;
+
+    if (walletInputTs.length > 0) {
+      // 가장 최근의 Transaction을 가져옵니다.
+      const recentInputT = walletInputTs.reduce(
+        (prev, current) => prev.input.timestamp > current.input.timestamp ? prev : current
+      );
+
+      // 최근의 Transaction에서 Balance을 가져옵니다.
+      balance = recentInputT.outputs.find(output => output.address === this.publicKey).amount;
+      // Input Balance가 갱신된 시간을 가져옵니다.
+      startTime = recentInputT.input.timestamp;
+    }
+
+    // 이후 Transaction들을 가져오며 startTime 이후에 시작된 모든 Transaction들에 대하여 Output의 잔고를 더합니다.
+    transactions.forEach(transaction => {
+      if (transactions.input.timestamp > startTime) {
+        transaction.outputs.find(output => {
+          if (output.address === this.publicKey) {
+            balance += output.amount;
+          }
+        });
+      }
+    });
+
+    return balance;
+  }
+
+  /**
    * Blockchain Wallet을 만듭니다.
    */
   static blockchainWallet() {
