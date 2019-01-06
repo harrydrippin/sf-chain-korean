@@ -39,6 +39,9 @@ class Miner {
     this.transactionPool.clear();
 
     // 모든 채굴자에게 그들의 Transaction Pool을 비우라고 알림
+    this.p2pServer.broadcastClearTransactions();
+
+    return block;
   }
 }
 

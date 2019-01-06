@@ -11,7 +11,8 @@ const peers = process.env.PEERS ? process.env.PEERS.split(",") : [];
 // 각 Socket Message를 구별하기 위한 Message Type입니다.
 const MESSAGE_TYPES = {
   chain: "CHAIN",
-  transaction: "TRANSACTION"
+  transaction: "TRANSACTION",
+  clear_transactions: "CLEAR_TRANSACTIONS"
 };
 
 /**
@@ -93,6 +94,9 @@ class P2pServer {
           // Transaction Pool에 추가하거나 갱신합니다.
           this.transactionPool.updateOrAddTransaction(data.transaction);
           break;
+        case MESSAGE_TYPES.clear_transactions:
+          this.transactionPool.clear();
+          break;
       }
     });
   }
@@ -134,6 +138,15 @@ class P2pServer {
    */
   broadcastTransaction(transaction) {
     this.sockets.forEach(socket => this.sendTransaction(socket, transaction));
+  }
+
+  /**
+   * Transaction Pool을 비우라는 메시지를 전파합니다.
+   */
+  broadcastClearTransactions() {
+    this.sockets.forEach(socket => socket.send(JSON.stringify({
+      tyoe: MESSAGE_TYPES.clear_transactions
+    }))); 
   }
 }
 
