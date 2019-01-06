@@ -1,3 +1,4 @@
+const ChainUtil = require("../chain-util");
 const { INITIAL_BALANCE } = require("../config");
 
 /**
@@ -10,8 +11,10 @@ class Wallet {
   constructor() {
     // Global Variable인 시작 잔고 값을 대입합니다.
     this.balance = INITIAL_BALANCE;
-    this.keyPair = null;
-    this.publicKey = null;
+    // Key Pair를 새로 생성하여 대입합니다.
+    this.keyPair = ChainUtil.genKeyPair();
+    // 생성한 Key Pair에서 Public Key를 가져와 대입합니다.
+    this.publicKey = this.keyPair.getPublic().encode('hex');
   }
 
   /**
